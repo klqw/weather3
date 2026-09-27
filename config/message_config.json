@@ -1,0 +1,55 @@
+{
+  "make_locations": {
+    "get_prec_no": "prec_no参照CSV読み込み完了: {path}",
+    "get_stations": "prec_no: {prec_no} prefecture_name: {prefecture_name} を取得 ({count}地点)",
+    "amdmaster_download_done": "amdmaster.index4のダウンロード完了",
+    "set_locations_done": "locationsテーブルへの地点マスタ登録が完了しました。登録件数: {count}件",
+    "prec_no_not_found": "prec_no参照CSVがありません: {path}",
+    "amdmaster_not_found": "amdmaster.index4が見つからないため、ダウンロードします: {path}",
+    "amdmaster_download_failed": "amdmaster.index4のダウンロードに失敗しました: {url}",
+    "save_amdmaster_failed": "amdmaster.index4の保存に失敗しました",
+    "set_locations_failed": "地点マスタのDB登録に失敗しました",
+    "locations_validate_error": "地点マスタに必須項目がありません\n{errors}"
+  },
+  "download_jma": {
+    "download_done": "ダウンロード完了: {filename}",
+    "file_delete_done": "CSV削除: {path}",
+    "register_jma_done": "気象データのDB登録が完了しました。地点: {location} - {prefecture}, 登録件数: {count}件",
+    "update_locations_done": "地点マスタのDB更新が完了しました。地点: {location} - {prefecture}",
+    "no_location": "指定された地点が見つかりません 地点名: {location}, 都府県名: {prefecture}",
+    "get_locations_failed": "locationsテーブルからの取得に失敗しました",
+    "location_not_found": "ダウンロード対象の地点が見つかりません",
+    "download_failed": "ファイルのダウンロードに失敗しました: {filename}",
+    "file_delete_failed": "CSV削除に失敗しました: {path}, エラー: {error}",
+    "no_records_found": "登録可能な気象データがありません。地点: {location} - {prefecture}",
+    "parser_description": "地点指定ダウンロード",
+    "parser_location": "地点名を漢字または英字で指定",
+    "parser_prefecture": "都府県名を漢字または英字で指定",
+    "parser_error": "--location と --prefecture は両方指定するか、両方省略してください",
+    "gateway_timeout": "Gateway Timeout: {filename} / {retry_interval}秒後に再試行 ({attempt}/{retry_count})",
+    "chunk_reduction": "チャンクを{chunk_years}年に縮小して再実行: {filename}"
+  },
+  "register_jma": {
+    "read_csv": "CSV読み込み: {filename}",
+    "csv_not_found": "CSVファイルがありません",
+    "register_jma_failed": "気象データのDB登録に失敗しました",
+    "update_locations_failed": "locationsテーブルの更新に失敗しました"
+  },
+  "make_stats": {
+    "set_stats_done": "{name} 登録完了: {count}件",
+    "get_stats_failed": "weather_observations, locationテーブルからの取得に失敗しました",
+    "no_records_found": "{table}の取得結果が0件です",
+    "set_stats_failed": "{table}へのDB登録に失敗しました"
+  },
+  "daily_update": {
+    "update_done": "地点: {location} - {prefecture}, 更新基準日: {start_date} - 取得終了日: {end_date}, 登録件数: {count}件",
+    "batch_done": "日次更新完了: 成功地点={success_count}, 失敗地点={error_count}, 登録件数={count}件",
+    "get_locations_failed": "locationsテーブルからの取得に失敗しました",
+    "set_weather_data_failed": "weather_observationsテーブルの更新に失敗しました。地点: {location} - {prefecture}",
+    "update_locations_failed": "locationsテーブルの更新に失敗しました。地点: {location} - {prefecture}",
+    "request_failed": "気象庁からの日別観測値取得に失敗しました。地点: {location} - {prefecture}, URL: {url}",
+    "table_not_found": "日別観測値テーブルが見つかりません。地点: {location} - {prefecture}, URL: {url}",
+    "invalid_station_type": "未対応のstation_typeです: {station_type}",
+    "parse_failed": "日別観測値の解析に失敗しました。地点: {location} - {prefecture}, 対象年月: {year}年{month}月"
+  }
+}

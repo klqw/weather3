@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    {{ observations[0].name }} - {{ observations[0].prefecture_name }}
+  </title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>
+    {{ observations[0].name }} - {{ observations[0].prefecture_name }}
+  </h1>
+
+  <div
+   id="location-dates"
+   data-station-type="{{ station_type }}"
+   data-block-no="{{ block_no }}"></div>
+
+  <script id="location-dates-data" type="application/json">
+    {{ observation_dates | tojson }}
+  </script>
+
+  <script type="module" src="/static/react/location-dates.js"></script>
+
+</body>
+</html>

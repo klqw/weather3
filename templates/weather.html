@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    {{ weather.location.observed_date.year}}年{{ weather.location.observed_date.month}}月{{ weather.location.observed_date.day}}日
+    {{ weather.location.name }} - {{ weather.location.prefecture_name }}
+  </title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="header">
+    <h1>
+      {{ weather.location.observed_date.year }}年{{ weather.location.observed_date.month }}月{{ weather.location.observed_date.day }}日
+      {{ weather.location.name }} - {{ weather.location.prefecture_name }}
+    </h1>
+  </header>
+
+  {% for group in weather.groups %}
+    <div class="weather-card">
+      <h2>{{ group.comparison }}</h2>
+      {% for item in group.weather_items %}
+        <h3>{{ item.item }}</h3>
+        <div class="actual">
+          実測値 <strong style="color: {{ item.actual_color }};">
+            {{ item.actual }}{{ item.unit }}
+          </strong>
+        </div>
+        <div class="averages">
+          <span>地点平均 {{ item.location_avg }}{{ item.unit }}</span>
+          <span>全体平均 {{ item.overall_avg }}{{ item.unit }}</span>
+        </div>
+
+        <div class="differences">
+          <span>地点平均との差 
+            <span class="{{ item.location_diff_color }}">
+              {{ item.location_diff }}{{ item.unit }}
+            </span>
+          </span>
+          <span>全体平均との差 
+            <span class="{{ item.overall_diff_color }}">
+              {{ item.overall_diff }}{{ item.unit }}
+            </span>
+          </span>
+        </div>
+
+        <div class="score-group">
+          <div class="score-row">
+            <span class="score-label">地点</span>
+            <span class="low" style="color: {{ item.low_label_color }};">
+              {{ item.low_label }}
+            </span>
+
+            <div class="bar">
+              <div class="bar-fill" style="width: {{ item.location_score }}%; background-color: {{ item.location_score_color }};"></div>
+              {% if item.location_score != 0 %}
+                <span class="marker" style="left: {{  item.location_score }}%; background-color: {{ item.location_score_color }};">
+                  {{ item.location_score }}
+                </span>
+              {% endif %}
+            </div>
+
+            <span class="high" style="color: {{ item.high_label_color }};">
+              {{ item.high_label }}
+            </span>
+          </div>
+
+          <div class="score-row">
+            <span class="score-label">全体</span>
+            <span class="low" style="color: {{ item.low_label_color }};">
+              {{ item.low_label }}
+            </span>
+
+            <div class="bar">
+              <div class="bar-fill" style="width: {{ item.overall_score }}%; background-color: {{ item.overall_score_color }};"></div>
+              {% if item.overall_score != 0 %}
+                <span class="marker" style="left: {{ item.overall_score }}%; background-color: {{ item.overall_score_color }};">
+                  {{ item.overall_score }}
+                </span>
+              {% endif %}
+            </div>
+
+            <span class="high" style="color: {{ item.high_label_color }};">
+              {{ item.high_label }}
+            </span>
+          </div>
+        </div>
+
+        {% if not loop.last %}
+          <hr>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endfor %}
+
+</body>
+</html>

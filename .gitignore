@@ -216,3 +216,16 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Secret File
+config/db_secret.ini
+
+# Node / npm
+frontend/node_modules/
+frontend/dist/
+
+# Vite
+frontend/.vite/
+
+# Logs
+log/
