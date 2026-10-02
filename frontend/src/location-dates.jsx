@@ -76,7 +76,7 @@ function LocationDates({
                     {openMonths[key] && (
                       <div className="date-days">
                         {days.map(({ day, date }) => (
-                          <a key={date} href={`/weather/${stationType}/${blockNo}/${date}`}>
+                          <a key={date} href={`/weather/${stationType}/${blockNo}/${date}`} target="_blank">
                             {day}日
                           </a>
                         ))}

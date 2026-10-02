@@ -416,10 +416,6 @@ def daily_diff(df, target_data):
   # ターゲット地点のlocation_idを取得
   location_id = target_data["location_id"].iloc[0]
 
-  # 指定日の月・日を取得
-  target_month = target_data["month"].iloc[0]
-  target_day = target_data["day"].iloc[0]
-
   # 全地点の指定日の月・日に対する平均値を取得
   all_avg = df.groupby(["location_id", "month", "day"])[
     get_temp_columns()
@@ -461,9 +457,6 @@ def month_diff(df, target_data):
 
   # ターゲット地点のlocation_idを取得
   location_id = target_data["location_id"].iloc[0]
-
-  # 指定日の月を取得
-  target_month = target_data["month"].iloc[0]
 
   # 全地点の指定日の月に対する平均値を取得
   all_avg = df.groupby(["location_id", "month"])[
@@ -717,4 +710,4 @@ def make_weather_groups(weather_data, item_config):
       "weather_items": items
     })
 
-    return groups
+  return groups
