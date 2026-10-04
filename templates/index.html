@@ -8,12 +8,8 @@
 <body>
   <h1>地点一覧</h1>
 
-  {% for prefecture in prefectures %}
-    <p>
-      <a href="/prefecture/{{ prefecture.prec_no }}" target="_blank">
-        {{ prefecture.prefecture_name }}
-      </a>
-    </p>
-  {% endfor %}
+  <div id="weather-app"></div> 
+
+  <script type="module" src="/static/react/weather-app.js"></script>
 </body>
 </html>

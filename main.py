@@ -3,10 +3,11 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
-from weather import get_prefectures
-from weather import get_locations
-from weather import get_location_dates
-from weather import get_weather_card
+# from weather import get_prefectures
+# from weather import get_locations
+# from weather import get_location_dates
+# from weather import get_weather_card
+import weather as w
 
 BASE_DIR = Path(__file__).resolve().parent
 CONFIG_FILE = BASE_DIR / "config" / "config.ini"
@@ -34,7 +35,7 @@ app.mount(
 @app.get("/")
 def index(request: Request):
   config = load_config()
-  prefectures = get_prefectures(config)
+  prefectures = w.get_prefectures(config)
 
   return templates.TemplateResponse(
     request=request,
@@ -44,6 +45,10 @@ def index(request: Request):
     }
   )
 
+@app.get("/api/prefectures")
+def api_prefectures():
+  config = load_config()
+  return w.get_prefectures(config)
 
 @app.get("/prefecture/{prec_no}/")
 def locations(
@@ -51,7 +56,7 @@ def locations(
   prec_no: str
 ):
   config = load_config()
-  locations = get_locations(
+  locations = w.get_locations(
     prec_no,
     config
   )
@@ -64,6 +69,13 @@ def locations(
     }
   )
 
+@app.get("/api/locations/{prec_no}")
+def api_locatoins(prec_no: str):
+  config = load_config()
+  return w.get_locations(
+    prec_no,
+    config
+  )
 
 @app.get("/location/{station_type}/{block_no}")
 def location_dates(
@@ -72,7 +84,7 @@ def location_dates(
   block_no: str
 ):
   config = load_config()
-  observations = get_location_dates(
+  observations = w.get_location_dates(
     station_type,
     block_no,
     config
@@ -93,6 +105,19 @@ def location_dates(
     }
   )
 
+@app.get("/api/location/{station_type}/{block_no}/dates")
+def api_location_dates(station_type: str, block_no: str):
+  config = load_config()
+  rows = w.get_location_dates(
+    station_type,
+    block_no,
+    config
+  )
+
+  return [
+    row["observed_date"]
+    for row in rows
+  ]
 
 @app.get("/weather/{station_type}/{block_no}/{date}")
 def weather(
@@ -102,7 +127,7 @@ def weather(
   date: str
 ):
   config = load_config()
-  weather_data = get_weather_card(
+  weather_data = w.get_weather_card(
     station_type,
     block_no,
     date,
