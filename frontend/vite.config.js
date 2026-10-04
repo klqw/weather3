@@ -11,10 +11,12 @@ export default defineConfig({
     emptyOutDir: true,
 
     rollupOptions: {
-      input: "src/location-dates.jsx",
-
+      input: {
+        "location-dates": "src/location-dates.jsx",
+        "weather-app": "src/weather-app.jsx"
+      },
       output: {
-        entryFileNames: "location-dates.js"
+        entryFileNames: "[name].js"
       }
     }
   }

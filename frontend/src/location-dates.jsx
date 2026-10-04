@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { createRoot } from "react-dom/client"
 
 function groupDates(dates) {
   const grouped = {}
@@ -93,16 +92,4 @@ function LocationDates({
   )
 }
 
-const element = document.getElementById("location-dates-data")
-const dates = JSON.parse(element.textContent)
-const rootElement = document.getElementById("location-dates")
-const stationType = rootElement.dataset.stationType
-const blockNo = rootElement.dataset.blockNo
-
-createRoot(rootElement).render(
-  <LocationDates
-  dates={dates}
-  stationType={stationType}
-  blockNo={blockNo}
-  />
-)
+export default LocationDates
