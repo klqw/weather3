@@ -70,37 +70,50 @@ function WeatherApp() {
   }
 
   return (
-    <div>
-      <select value={selectedPrecNo} onChange={handlePrefectureChange}>
-        <option value="">
-          都府県を選択してください
-        </option>
+    <div className="weather-selector">
+      <div className="select-group">
+        <label htmlFor="prefecture-select">
+          都府県
+        </label>
 
-        {prefectures.map(prefecture => (
-          <option key={prefecture.prec_no} value={prefecture.prec_no}>
-            {prefecture.prefecture_name}
+        <select id="prefecture-select" value={selectedPrecNo} onChange={handlePrefectureChange}>
+          <option value="">
+            都府県を選択してください
           </option>
-        ))}
-      </select>
 
-      <select onChange={handleLocationChange} disabled={locations.length === 0}>
-        <option value="">
-          地点を選択してください
-        </option>
+          {prefectures.map(prefecture => (
+            <option key={prefecture.prec_no} value={prefecture.prec_no}>
+              {prefecture.prefecture_name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-        {locations.map(location => (
-          <option
-           key={`${location.station_type}-${location.block_no}`}
-           value={`${location.station_type}-${location.block_no}`}
-          >
-            {location.name}
+      <div className="select-group">
+        <label htmlFor="location-select">
+          地点
+        </label>
+
+        <select id="location-select" onChange={handleLocationChange} disabled={locations.length === 0}>
+          <option value="">
+            地点を選択してください
           </option>
-        ))}
-      </select>
+          
+          {locations.map(location => (
+            <option
+             key={`${location.station_type}-${location.block_no}`}
+             value={`${location.station_type}-${location.block_no}`}
+            >
+              {location.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {selectedLocation && (
-        <div>
-          選択地点: {selectedLocation.name}
+        <div className="selected-location">
+          {selectedLocation.prefecture_name}
+          <strong>{selectedLocation.name}</strong>
         </div>
       )}
 

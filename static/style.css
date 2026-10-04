@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: sans-serif;
   font-size: 0.8em;
@@ -22,6 +26,155 @@ body {
   letter-spacing: 0.05em;
 }
 
+/* --------------------
+   都府県・地点選択
+-------------------- */
+.weather-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.select-group label {
+  color: #4a4635;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.select-group select {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: white;
+  color: #4a4635;
+  border: 1px solid #ddd6c4;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.select-group select:focus {
+  outline: 2px solid #17e975;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(232, 223, 173, 0.4);
+}
+
+.select-group select:disabled {
+  background-color: #f3f1e8;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.selected-location {
+  padding: 12px 16px;
+  color: #4a4635;
+  background-color: #fffbea;
+  border-left: 5px solid #17e975;
+  border-radius: 6px;
+}
+
+.selected-location strong {
+  margin-left: 8px;
+  font-size: 18px;
+}
+
+/* --------------------
+   日付一覧
+-------------------- */
+.date-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.date-year {
+  overflow: hidden;
+  background-color: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.date-toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #4a4635;
+  text-align: left;
+  cursor: pointer;
+}
+
+.year-toggle {
+  padding: 14px 16px;
+  font-size: 18px;
+  font-weight: 600;
+  border-bottom: 2px solid #e8dfad;
+}
+
+.year-toggle:hover {
+  background: #f3fff8;
+}
+
+.date-months {
+  padding: 0 12px 12px;
+}
+
+.date-month {
+  border-top: 1px solid #ddd6c4;
+}
+
+.date-month:first-child {
+  border-top: none;
+}
+
+.month-toggle {
+  padding: 10px 12px;
+  font-size: 16px;
+}
+
+.month-toggle:hover {
+  background: #fffbea;
+}
+
+.date-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px 16px;
+}
+
+.date-days a {
+  min-width: 48px;
+  padding: 7px 10px;
+  color: #4a4635;
+  background-color: white;
+  border: 1px solid #ddd6c4;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.date-days a:hover {
+  border-color: #17e975;
+  background-color: #e8dfad;
+}
+
+/* --------------------
+   Card部分
+-------------------- */
 hr {
   border: none;
   border-top: 1px solid #ddd6c4;
@@ -182,4 +335,31 @@ hr {
 
 .zero {
   color: #666;
+}
+
+/* --------------------
+   SP用
+-------------------- */
+@media (max-width: 600px) {
+  body {
+    margin: 10px;
+  }
+
+  .header {
+    padding: 10px 12px;
+  }
+
+  .weather-selector {
+    padding: 15px;
+  }
+
+  .date-days {
+    gap: 6px;
+    padding: 8px 6px 14px;
+  }
+
+  .date-days a {
+    min-width: 44px;
+    padding: 7px 8px;
+  }
 }
