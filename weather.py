@@ -10,6 +10,28 @@ import service
 BASE_DIR = Path(__file__).resolve().parent
 CONFIG_FILE = BASE_DIR / "config" / "config.ini"
 
+# MAX / MIN 取得対象 絞り込み辞書
+METRIC_COLUMNS = {
+  "avg_temp": "avg_temp",
+  "max_temp": "max_temp",
+  "min_temp": "min_temp",
+  "avg_humidity": "avg_humidity",
+  "sunshine_hours": "sunshine_hours",
+  "avg_wind_speed": "avg_wind_speed",
+  "precipitation": "precipitation",
+  "max_snow_depth": "max_snow_depth"
+}
+
+EXTREME_TABLES = {
+  "max": "daily_max_stats",
+  "min": "daily_min_stats"
+}
+
+EXTREME_AGGREGATES = {
+  "max": "MAX",
+  "min": "MIN"
+}
+
 # --------------------
 # 設定ファイル
 # --------------------
@@ -211,13 +233,13 @@ def get_weather_card(station_type, block_no, date_str, config):
 
   # Controller渡し用にフォーマットを整える
   output_result_daily = service.make_result(
-    result_daily, comparison_daily, weather_row, score_daily
+    result_daily, comparison_daily, "day", weather_row, score_daily
   )
   output_result_month = service.make_result(
-    result_month, comparison_month, weather_row, score_month
+    result_month, comparison_month, "mon", weather_row, score_month
   )
   output_result_overall = service.make_result(
-    result_overall, comparison_overall, weather_row, score_overall
+    result_overall, comparison_overall, "all", weather_row, score_overall
   )
 
   weather_data = pd.concat([
@@ -232,3 +254,93 @@ def get_weather_card(station_type, block_no, date_str, config):
     "location": weather_row,
     "groups": groups
   }
+
+
+# --------------------
+# 項目ごとにMAX/MINの具体値取得
+# --------------------
+def get_extreme_records(
+    config, metric, comparison,
+    extreme, location_id, observed_date
+):
+  # 渡されたmetricからどの計測対象を参照するか決める
+  column = METRIC_COLUMNS.get(metric)
+  if column is None:
+    raise ValueError(f"未対応のmetricです: {metric}")
+
+  # MAX/MINのどちらのstatsテーブルを参照するか決める
+  table = EXTREME_TABLES[extreme]
+  if table is None:
+    raise ValueError(f"未対応のextremeです: {extreme}")
+  aggregate = EXTREME_AGGREGATES[extreme]
+
+  # Statsテーブルから候補を絞り込む辞書を作る
+  test = service.get_extreme_candidates(
+    config, column, table,
+    aggregate, comparison,
+    location_id, observed_date
+  )
+
+  return test
+
+
+
+
+
+# 日ごと / 平均気温(℃) / 地点
+def get_loc_day_avg_temp_extremes(config, location_id, observed_date):
+  sql = """
+    WITH params AS (
+      SELECT
+        %s::integer AS location_id,
+        %s::integer AS month,
+        %s::integer AS day
+    ),
+    extreme AS (
+      SELECT
+        'max' AS extreme_type,
+        avg_temp AS value
+      FROM daily_max_stats AS s
+      CROSS JOIN params AS p
+      WHERE s.location_id = p.location_id
+        AND s.month = p.month
+        AND s.day = p.day
+
+      UNION ALL
+
+      SELECT
+        'min' AS extreme_type,
+        avg_temp AS value
+      FROM daily_min_stats AS s
+      CROSS JOIN params AS p
+      WHERE s.location_id = p.location_id
+        AND s.month = p.month
+        AND s.day = p.day
+    )
+    SELECT
+      e.extreme_type,
+      e.value,
+      w.observed_date
+    FROM extreme AS e
+    CROSS JOIN params AS p
+    INNER JOIN weather_observations AS w
+      ON w.location_id = p.location_id
+      AND EXTRACT(MONTH FROM w.observed_date) = p.month
+      AND EXTRACT(DAY FROM w.observed_date) = p.day
+      AND w.avg_temp = e.value
+    WHERE e.value IS NOT NULL
+    ORDER BY
+      CASE e.extreme_type
+        WHEN 'max' THEN 1
+        ELSE 2
+      END,
+      w.observed_date;
+  """
+
+  params = (location_id, observed_date.month, observed_date.day)
+
+  with get_connection(config) as conn:
+    with conn.cursor(row_factory=dict_row) as cur:
+      cur.execute(sql, params)
+
+      return cur.fetchall()

@@ -1,12 +1,9 @@
 import configparser
+from datetime import datetime
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
-# from weather import get_prefectures
-# from weather import get_locations
-# from weather import get_location_dates
-# from weather import get_weather_card
 import weather as w
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -50,59 +47,12 @@ def api_prefectures():
   config = load_config()
   return w.get_prefectures(config)
 
-@app.get("/prefecture/{prec_no}/")
-def locations(
-  request: Request,
-  prec_no: str
-):
-  config = load_config()
-  locations = w.get_locations(
-    prec_no,
-    config
-  )
-
-  return templates.TemplateResponse(
-    request=request,
-    name="locations.html",
-    context={
-      "locations": locations
-    }
-  )
-
 @app.get("/api/locations/{prec_no}")
 def api_locatoins(prec_no: str):
   config = load_config()
   return w.get_locations(
     prec_no,
     config
-  )
-
-@app.get("/location/{station_type}/{block_no}")
-def location_dates(
-  request: Request,
-  station_type: str,
-  block_no: str
-):
-  config = load_config()
-  observations = w.get_location_dates(
-    station_type,
-    block_no,
-    config
-  )
-  observation_dates = [
-    row["observed_date"].isoformat()
-    for row in observations
-  ]
-
-  return templates.TemplateResponse(
-    request=request,
-    name="location_dates.html",
-    context={
-      "station_type": station_type,
-      "block_no": block_no,
-      "observations": observations,
-      "observation_dates": observation_dates
-    }
   )
 
 @app.get("/api/location/{station_type}/{block_no}/dates")
@@ -140,4 +90,35 @@ def weather(
     context={
       "weather": weather_data
     }
+  )
+
+"""
+metric: 
+  avg_temp, max_temp, min_temp,
+  avg_humidity, sunshine_hours, avg_wind_speed,
+  precipitation, max_snow_dept
+comparison:
+  loc_day, loc_mon, loc_all,
+  all_day, all_mon, all_all
+extreme:
+  max, min
+"""
+@app.get("/api/extremes/{metric}/{comparison}/{extreme}/{location_id}/{date}")
+def get_extremes(
+  metric: str,
+  comparison: str,
+  extreme: str,
+  location_id: int,
+  date: str
+):
+  config = load_config()
+  observed_date = datetime.strptime(date, "%Y%m%d").date()
+
+  return w.get_extreme_records(
+    config,
+    metric,
+    comparison,
+    extreme,
+    location_id,
+    observed_date
   )

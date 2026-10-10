@@ -570,13 +570,14 @@ def make_score(max_df, min_df, target_data, config):
 # --------------------
 # 計算結果整形
 # --------------------
-def make_result(result, comparison, location_data, score):
+def make_result(result, comparison, comparison_key, location_data, score):
 
-  # 出力用DataFrameに 比較対象, 地点, スコアを追加
+  # 出力用DataFrameに 比較対象, 比較対象キー, 地点, スコアを追加
   result = result.copy()
   result.insert(0, "比較対象", comparison)
-  result.insert(1, "地点", location_data["name"])
-  result.insert(2, "都府県", location_data["prefecture_name"])
+  result.insert(1, "比較対象キー", comparison_key)
+  result.insert(2, "地点", location_data["name"])
+  result.insert(3, "都府県", location_data["prefecture_name"])
   result = result.reset_index()
   result = result.rename(columns={"index": "項目"})
   result = result.join(
@@ -674,6 +675,7 @@ def make_weather_groups(weather_data, item_config):
 
   for comparison, group in weather_data.groupby("比較対象", sort=False):
     items = []
+    comparison_key = group["比較対象キー"].iloc[0]
 
     for _, row in group.iterrows():
       item = row["項目"]
@@ -702,12 +704,108 @@ def make_weather_groups(weather_data, item_config):
         "high_label": item_config[item]["high_label"],
         # スコアバーのラベル色設定
         "low_label_color": item_config[item]["colors"][0],
-        "high_label_color": item_config[item]["colors"][4]
+        "high_label_color": item_config[item]["colors"][4],
+        # MAX/MIN取得用
+        "metric": item_config[item]["metric"],
+        "extremes": item_config[item]["extremes"]
       })
 
     groups.append({
       "comparison": comparison,
+      "comparison_key": comparison_key,
       "weather_items": items
     })
 
   return groups
+
+
+# --------------------
+# MAX/MIN値取得
+# 取得対象: weather_observations
+# statsテーブルから候補値で索引生成
+# --------------------
+def get_extreme_candidates(config, column, table, aggregate, comparison, location_id, observed_date):
+  if comparison == "loc_day":
+    where = """
+      WHERE s.location_id = %s
+        AND s.month = %s
+        AND s.day = %s
+    """
+    params = (
+      location_id,
+      observed_date.month,
+      observed_date.day
+    )
+
+  elif comparison == "loc_mon":
+    where = """
+      WHERE s.location_id = %s
+        AND s.month = %s
+    """
+    params = (
+      location_id,
+      observed_date.month
+    )
+
+  elif comparison == "loc_all":
+    where = """
+      WHERE s.location_id = %s
+    """
+    params = (location_id,)
+
+  elif comparison == "all_day":
+    where = """
+      WHERE s.month = %s
+        AND s.day = %s
+    """
+    params = (
+      observed_date.month,
+      observed_date.day
+    )
+
+  elif comparison == "all_mon":
+    where = """
+      WHERE s.month = %s
+    """
+    params = (observed_date.month,)
+
+  elif comparison == "all_all":
+    where = ""
+    params = ()
+
+  else:
+    raise ValueError(f"未対応のcomparisonです: {comparison}")
+
+  sql = f"""
+    WITH filtered AS (
+      SELECT
+        location_id,
+        month,
+        day,
+        {column} AS value
+      FROM {table} AS s
+      {where}
+    ),
+    extreme_value AS (
+      SELECT
+        {aggregate}(value) AS value
+      FROM filtered
+    )
+    SELECT
+      f.location_id,
+      f.month,
+      f.day,
+      f.value
+    FROM filtered AS f
+    CROSS JOIN extreme_value AS e
+    WHERE f.value = e.value
+    ORDER BY
+      f.location_id,
+      f.month,
+      f.day;
+  """
+
+  with get_connection(config) as conn:
+    with conn.cursor(row_factory=dict_row) as cur:
+      cur.execute(sql, params)
+      return cur.fetchall()

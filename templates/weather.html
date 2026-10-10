@@ -48,9 +48,20 @@
         <div class="score-group">
           <div class="score-row">
             <span class="score-label">地点</span>
-            <span class="low" style="color: {{ item.low_label_color }};">
+            {# <span class="low" style="color: {{ item.low_label_color }};">
               {{ item.low_label }}
-            </span>
+            </span> #}
+            <div
+              class="extreme-details low"
+              data-location-id="{{ weather.location.location_id }}"
+              data-date="{{ weather.location.observed_date.strftime('%Y%m%d') }}"
+              data-metric="{{ item.metric }}"
+              data-comparison="loc_{{ group.comparison_key }}"
+              data-label="{{ item.low_label }}"
+              data-extreme="min"
+              data-extremes="{{ item.extremes | join(',') }}"
+              data-label-color="{{ item.low_label_color }}"
+            ></div>
 
             <div class="bar">
               <div class="bar-fill" style="width: {{ item.location_score }}%; background-color: {{ item.location_score_color }};"></div>
@@ -61,16 +72,38 @@
               {% endif %}
             </div>
 
-            <span class="high" style="color: {{ item.high_label_color }};">
+            {# <span class="high" style="color: {{ item.high_label_color }};">
               {{ item.high_label }}
-            </span>
+            </span> #}
+            <div
+             class="extreme-details high"
+             data-location-id="{{ weather.location.location_id }}"
+             data-date="{{ weather.location.observed_date.strftime('%Y%m%d') }}"
+             data-metric="{{ item.metric }}"
+             data-comparison="loc_{{ group.comparison_key }}"
+             data-label="{{ item.high_label }}"
+             data-extreme="max"
+             data-extremes="{{ item.extremes | join(',') }}"
+             data-label-color="{{ item.high_label_color }}"
+            ></div>
           </div>
 
           <div class="score-row">
             <span class="score-label">全体</span>
-            <span class="low" style="color: {{ item.low_label_color }};">
+            {# <span class="low" style="color: {{ item.low_label_color }};">
               {{ item.low_label }}
-            </span>
+            </span> #}
+            <div
+              class="extreme-details low"
+              data-location-id="{{ weather.location.location_id }}"
+              data-date="{{ weather.location.observed_date.strftime('%Y%m%d') }}"
+              data-metric="{{ item.metric }}"
+              data-comparison="all_{{ group.comparison_key }}"
+              data-label="{{ item.low_label }}"
+              data-extreme="min"
+              data-extremes="{{ item.extremes | join(',') }}"
+              data-label-color="{{ item.low_label_color }}"
+            ></div>
 
             <div class="bar">
               <div class="bar-fill" style="width: {{ item.overall_score }}%; background-color: {{ item.overall_score_color }};"></div>
@@ -81,9 +114,20 @@
               {% endif %}
             </div>
 
-            <span class="high" style="color: {{ item.high_label_color }};">
+            {# <span class="high" style="color: {{ item.high_label_color }};">
               {{ item.high_label }}
-            </span>
+            </span> #}
+            <div
+             class="extreme-details high"
+             data-location-id="{{ weather.location.location_id }}"
+             data-date="{{ weather.location.observed_date.strftime('%Y%m%d') }}"
+             data-metric="{{ item.metric }}"
+             data-comparison="all_{{ group.comparison_key }}"
+             data-label="{{ item.high_label }}"
+             data-extreme="max"
+             data-extremes="{{ item.extremes | join(',') }}"
+             data-label-color="{{ item.high_label_color }}"
+            ></div>
           </div>
         </div>
 
@@ -94,5 +138,6 @@
     </div>
   {% endfor %}
 
+  <script type="module" src="/static/react/extreme-details.js"></script>
 </body>
 </html>

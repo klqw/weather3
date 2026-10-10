@@ -13,7 +13,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         "location-dates": "src/location-dates.jsx",
-        "weather-app": "src/weather-app.jsx"
+        "weather-app": "src/weather-app.jsx",
+        "extreme-details": "src/extreme-details.jsx"
       },
       output: {
         entryFileNames: "[name].js"
