@@ -22,14 +22,15 @@ METRIC_COLUMNS = {
   "max_snow_depth": "max_snow_depth"
 }
 
-EXTREME_TABLES = {
-  "max": "daily_max_stats",
-  "min": "daily_min_stats"
-}
-
-EXTREME_AGGREGATES = {
-  "max": "MAX",
-  "min": "MIN"
+EXTREME_CONFIG = {
+  "max": {
+    "table": "daily_max_stats",
+    "aggregate": "MAX"
+  },
+  "min": {
+    "table": "daily_min_stats",
+    "aggregate": "MIN"
+  }
 }
 
 # --------------------
@@ -257,7 +258,7 @@ def get_weather_card(station_type, block_no, date_str, config):
 
 
 # --------------------
-# 項目ごとにMAX/MINの具体値取得
+# 項目ごとにMAX/MINの極値取得
 # --------------------
 def get_extreme_records(
     config, metric, comparison,
@@ -269,19 +270,27 @@ def get_extreme_records(
     raise ValueError(f"未対応のmetricです: {metric}")
 
   # MAX/MINのどちらのstatsテーブルを参照するか決める
-  table = EXTREME_TABLES[extreme]
-  if table is None:
+  extreme_config = EXTREME_CONFIG.get(extreme)
+  if extreme_config is None:
     raise ValueError(f"未対応のextremeです: {extreme}")
-  aggregate = EXTREME_AGGREGATES[extreme]
+  table = extreme_config["table"]
+  aggregate = extreme_config["aggregate"]
 
-  # Statsテーブルから候補を絞り込む辞書を作る
-  test = service.get_extreme_candidates(
+  # Statsテーブルから極値候補を取得
+  candidates = service.get_extreme_candidates(
     config, column, table,
     aggregate, comparison,
     location_id, observed_date
   )
 
-  return test
+  # 降水量と積雪がのMAX値が0の場合は該当なし扱いにする
+  if metric in ("precipitation", "max_snow_depth"):
+    if candidates and candidates[0]["value"] == 0:
+      return []
+
+  # 絞り込んだ候補を使用してweather_observationsテーブルから該当の年月日を取得
+  records = service.get_observation_records(config, candidates, column)
+  return records
 
 
 

@@ -720,9 +720,9 @@ def make_weather_groups(weather_data, item_config):
 
 
 # --------------------
-# MAX/MIN値取得
-# 取得対象: weather_observations
-# statsテーブルから候補値で索引生成
+# MAX/MINの候補値取得
+# 取得対象: daily_max_stats / daily_min_stats
+# 取得した候補値で索引生成
 # --------------------
 def get_extreme_candidates(config, column, table, aggregate, comparison, location_id, observed_date):
   if comparison == "loc_day":
@@ -808,4 +808,60 @@ def get_extreme_candidates(config, column, table, aggregate, comparison, locatio
   with get_connection(config) as conn:
     with conn.cursor(row_factory=dict_row) as cur:
       cur.execute(sql, params)
+      return cur.fetchall()
+
+# --------------------
+# MAX/MIN値の観測年月日取得
+# 取得対象: weather_observations
+# statsテーブルで生成した索引を使用
+# --------------------
+def get_observation_records(config, candidates, column):
+  if not candidates:
+    return []
+
+  placeholders = ", ".join(
+    ["(%s, %s, %s, %s)"] * len(candidates)
+  )
+
+  params = []
+  for candidate in candidates:
+    params.extend([
+      candidate["location_id"],
+      candidate["month"],
+      candidate["day"],
+      candidate["value"]
+    ])
+
+  sql = f"""
+    WITH candidates (
+      location_id,
+      month,
+      day,
+      value
+    ) AS (
+      VALUES {placeholders}
+    )
+    SELECT
+      w.location_id,
+      w.observed_date,
+      w.{column} AS value,
+      l.name,
+      l.prefecture_name
+    FROM weather_observations AS w
+    INNER JOIN candidates AS c
+      ON w.location_id = c.location_id
+      AND EXTRACT(MONTH FROM w.observed_date) = c.month
+      AND EXTRACT(DAY FROM w.observed_date) = c.day
+      AND w.{column} = c.value
+    INNER JOIN locations AS l
+      ON w.location_id = l.location_id
+    ORDER BY
+      w.location_id,
+      w.observed_date;
+  """
+
+  with get_connection(config) as conn:
+    with conn.cursor(row_factory=dict_row) as cur:
+      cur.execute(sql, params)
+
       return cur.fetchall()
