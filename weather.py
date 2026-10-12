@@ -293,9 +293,6 @@ def get_extreme_records(
   return records
 
 
-
-
-
 # 日ごと / 平均気温(℃) / 地点
 def get_loc_day_avg_temp_extremes(config, location_id, observed_date):
   sql = """

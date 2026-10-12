@@ -29,6 +29,7 @@ app.mount(
   name="static"
 )
 
+# root
 @app.get("/")
 def index(request: Request):
   config = load_config()
@@ -42,6 +43,7 @@ def index(request: Request):
     }
   )
 
+# 都府県選択
 @app.get("/api/prefectures")
 def api_prefectures():
   config = load_config()
@@ -55,6 +57,7 @@ def api_locatoins(prec_no: str):
     config
   )
 
+# 地点選択
 @app.get("/api/location/{station_type}/{block_no}/dates")
 def api_location_dates(station_type: str, block_no: str):
   config = load_config()
@@ -69,6 +72,7 @@ def api_location_dates(station_type: str, block_no: str):
     for row in rows
   ]
 
+# 日付選択
 @app.get("/weather/{station_type}/{block_no}/{date}")
 def weather(
   request: Request,
@@ -92,7 +96,24 @@ def weather(
     }
   )
 
+# 日付選択(SPA)
+@app.get("/api/weather/{station_type}/{block_no}/{date}")
+def get_weather_api(
+  station_type: str,
+  block_no: str,
+  date: str
+):
+  config = load_config()
+
+  return w.get_weather_card(
+    station_type,
+    block_no,
+    date,
+    config
+  )
+
 """
+極値表示
 metric: 
   avg_temp, max_temp, min_temp,
   avg_humidity, sunshine_hours, avg_wind_speed,

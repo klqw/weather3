@@ -156,7 +156,7 @@ body {
   padding: 8px 12px 16px;
 }
 
-.date-days a {
+.date-days a, .date-days button {
   min-width: 48px;
   padding: 7px 10px;
   color: #4a4635;
@@ -167,7 +167,7 @@ body {
   text-decoration: none;
 }
 
-.date-days a:hover {
+.date-days a:hover, .date-days button:hover {
   border-color: #17e975;
   background-color: #e8dfad;
 }
@@ -433,6 +433,62 @@ hr {
 }
 
 /* --------------------
+   SPAのタブ
+-------------------- */
+.weather-back {
+  padding: 7px 12px;
+  color: #4a4635;
+  background-color: #fffbea;
+  border: 1px solid #e8dfad;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 1em;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+
+.weather-back:hover {
+  background-color: #17e975;
+}
+
+.weather-back:active {
+  transform: translateY(1px);
+}
+
+.weather-tabs {
+  display: flex;
+  margin: 20px 0;
+}
+
+.weather-tabs button {
+  flex: 1;
+  padding: 10px;
+  color: #4a4635;
+  background-color: white;
+  border: 1px solid #e8dfad;
+  font-size: 1.2em;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+
+.weather-tabs button:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.weather-tabs button:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+.weather-tabs button:not(:first-child) {
+  border-left: 0;
+}
+
+.weather-tabs button.active {
+  background-color: #17e975;
+}
+
+/* --------------------
    SP用
 -------------------- */
 @media (max-width: 600px) {
@@ -453,7 +509,7 @@ hr {
     padding: 8px 6px 14px;
   }
 
-  .date-days a {
+  .date-days a, .date-days button {
     min-width: 44px;
     padding: 7px 8px;
   }

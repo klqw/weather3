@@ -26,7 +26,8 @@ function groupDates(dates) {
 function LocationDates({
   dates,
   stationType,
-  blockNo
+  blockNo,
+  onSelectDate
 }) {
   const grouped = groupDates(dates)
 
@@ -75,9 +76,10 @@ function LocationDates({
                     {openMonths[key] && (
                       <div className="date-days">
                         {days.map(({ day, date }) => (
-                          <a key={date} href={`/weather/${stationType}/${blockNo}/${date}`} target="_blank">
-                            {day}日
-                          </a>
+                          // <a key={date} href={`/weather/${stationType}/${blockNo}/${date}`} target="_blank">
+                          //   {day}日
+                          // </a>
+                          <button key={date} type="button" onClick={() => onSelectDate(date)}>{day}日</button>
                         ))}
                       </div>
                     )}

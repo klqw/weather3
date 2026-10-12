@@ -109,3 +109,5 @@ rootElements.forEach(rootElement => {
     />
   )
 })
+
+export default ExtremeDetails
