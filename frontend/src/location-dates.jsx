@@ -27,12 +27,14 @@ function LocationDates({
   dates,
   stationType,
   blockNo,
-  onSelectDate
+  onSelectDate,
+  openNewTab,
+  openYears,
+  setOpenYears,
+  openMonths,
+  setOpenMonths
 }) {
   const grouped = groupDates(dates)
-
-  const [openYears, setOpenYears] = useState({})
-  const [openMonths, setOpenMonths] = useState({})
 
   function toggleYear(year) {
     setOpenYears(prev => ({
@@ -76,10 +78,15 @@ function LocationDates({
                     {openMonths[key] && (
                       <div className="date-days">
                         {days.map(({ day, date }) => (
-                          // <a key={date} href={`/weather/${stationType}/${blockNo}/${date}`} target="_blank">
-                          //   {day}日
-                          // </a>
-                          <button key={date} type="button" onClick={() => onSelectDate(date)}>{day}日</button>
+                          openNewTab ? (
+                            <a key={date} href={`/weather/${stationType}/${blockNo}/${date}`} target="_blank">
+                              {day}日
+                            </a>
+                          ) : (
+                            <button key={date} type="button" onClick={() => onSelectDate(date)}>
+                              {day}日
+                            </button>
+                          )
                         ))}
                       </div>
                     )}

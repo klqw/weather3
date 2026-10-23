@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useLayoutEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 import LocationDates from "./location-dates"
 import WeatherView from "./weather-view"
@@ -12,8 +12,17 @@ function WeatherApp() {
   const [selectedLocation, setSelectedLocation] = useState(null)
   // 日付
   const [dates, setDates] = useState([])
+  // 日付展開状態
+  const [openYears, setOpenYears] = useState({})
+  const [openMonths, setOpenMonths] = useState({})
+  // 日付選択時のスクロール位置
+  const [listScrollY, setListScrollY] = useState(0)
+  // スクロール位置復元するかどうか
+  const [restoreScroll, setRestoreScroll] = useState(false)
   // WeatherCard
   const [weather, setWeather] = useState(null)
+  // SPA <-> 別タブ切り替え
+  const [openNewTab, setOpenNewTab] = useState(false)
 
   // ページを読み込んだら都府県APIを呼ぶ
   useEffect(() => {
@@ -52,9 +61,54 @@ function WeatherApp() {
     })
   }, [selectedLocation])
 
+  // 画面を狭くしたときに別タブモードを強制的に解除する
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 500px)")
+
+    function handleChange(event) {
+      if (event.matches) {
+        setOpenNewTab(false)
+      }
+    }
+
+    if (media.matches) {
+      setOpenNewTab(false)
+    }
+
+    media.addEventListener("change", handleChange)
+
+    return () => {
+      media.removeEventListener("change", handleChange)
+    }
+  }, [])
+
+  // 日付選択 <-> Weather Cardのスクロール位置調整
+  useLayoutEffect(() => {
+    // Weather Cardを表示したとき
+    if (weather) {
+      window.scrollTo({
+        top: 250,
+        behavior: "auto"
+      })
+      return
+    }
+    // 日付選択に戻るとき
+    if (restoreScroll) {
+      window.scrollTo({
+        top: listScrollY,
+        behavior: "auto"
+      })
+      setRestoreScroll(false)
+    }
+  }, [weather, restoreScroll, listScrollY])
+
   function handlePrefectureChange(event) {
     setSelectedPrecNo(event.target.value)
     setSelectedLocation(null)
+    setDates([])
+    setWeather(null)
+    setOpenYears({})
+    setOpenMonths({})
   }
 
   function handleLocationChange(event) {
@@ -62,6 +116,9 @@ function WeatherApp() {
 
     if (!value) {
       setSelectedLocation(null)
+      setWeather(null)
+      setOpenYears({})
+      setOpenMonths({})
       return
     }
 
@@ -70,10 +127,16 @@ function WeatherApp() {
         `${location.station_type}-${location.block_no}` === value
     )
     setSelectedLocation(location)
+    setWeather(null)
+    setOpenYears({})
+    setOpenMonths({})
   }
 
   // 日付を選択したらWeatherCardAPIを呼ぶ
   function loadWeather(date) {
+    // 日付選択時のスクロール位置保存
+    setListScrollY(window.scrollY)
+
     if (!selectedLocation) {
       return
     }
@@ -94,8 +157,23 @@ function WeatherApp() {
     })
   }
 
+  // 日付選択に戻るを押下したときの処理
+  function handleBack() {
+    setRestoreScroll(true)
+    setWeather(null)
+  }
+
   return (
     <div className="weather-selector">
+      <div className="new-tab-toggle">
+        <label>
+          <input
+            type="checkbox" checked={openNewTab}
+            onChange={event => setOpenNewTab(event.target.checked)}
+          />
+          別タブ表示
+        </label>
+      </div>
       <div className="select-group">
         <label htmlFor="prefecture-select">
           都府県
@@ -150,6 +228,11 @@ function WeatherApp() {
              stationType={selectedLocation.station_type}
              blockNo={selectedLocation.block_no}
              onSelectDate={loadWeather}
+             openNewTab={openNewTab}
+             openYears={openYears}
+             setOpenYears={setOpenYears}
+             openMonths={openMonths}
+             setOpenMonths={setOpenMonths}
             />
           )}
         </>
@@ -158,7 +241,7 @@ function WeatherApp() {
       {weather && (
         <WeatherView
          weather={weather}
-         onBack={() => setWeather(null)} />
+         onBack={handleBack} />
       )}
     </div>
   )

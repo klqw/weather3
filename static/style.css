@@ -27,6 +27,19 @@ body {
 }
 
 /* --------------------
+   SPA <-> 別タブ切り替え
+-------------------- */
+.new-tab-toggle {
+  display: block;
+}
+
+@media (max-width: 500px) {
+  .new-tab-toggle {
+    display: none;
+  }
+}
+
+/* --------------------
    都府県・地点選択
 -------------------- */
 .weather-selector {
@@ -335,6 +348,14 @@ hr {
 
 .zero {
   color: #666;
+}
+
+.weather-group {
+  display: none;
+}
+
+.weather-group.active {
+  display: block;
 }
 
 /* --------------------

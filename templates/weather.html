@@ -17,8 +17,20 @@
     </h1>
   </header>
 
+  <div class="weather-tabs">
+    <button type="button" class="active" data-tab="day">
+      Daily
+    </button>
+    <button type="button" data-tab="mon">
+      Month
+    </button>
+    <button type="button" data-tab="all">
+      Overall
+    </button>
+  </div>
+
   {% for group in weather.groups %}
-    <div class="weather-card">
+    <div class="weather-card weather-group{% if group.comparison_key == 'day' %} active{% endif %}" data-tab="{{ group.comparison_key }}">
       <h2>{{ group.comparison }}</h2>
       {% for item in group.weather_items %}
         <h3>{{ item.item }}</h3>
@@ -130,6 +142,28 @@
     </div>
   {% endfor %}
 
+  <script>
+    const tabButtons = document.querySelectorAll(".weather-tabs button")
+    const weatherGroups = document.querySelectorAll(".weather-group")
+
+    tabButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const selectedTab = button.dataset.tab
+
+        tabButtons.forEach(tab => {
+          tab.classList.remove("active")
+        })
+
+        weatherGroups.forEach(group => {
+          group.classList.remove("active")
+        })
+
+        button.classList.add("active")
+
+        document.querySelector(`.weather-group[data-tab="${selectedTab}"]`).classList.add("active")
+      })
+    })
+  </script>
   <script type="module" src="/static/react/extreme-details.js"></script>
 </body>
 </html>

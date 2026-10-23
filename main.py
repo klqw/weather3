@@ -72,7 +72,7 @@ def api_location_dates(station_type: str, block_no: str):
     for row in rows
   ]
 
-# 日付選択
+# 日付選択(別タブ)
 @app.get("/weather/{station_type}/{block_no}/{date}")
 def weather(
   request: Request,
