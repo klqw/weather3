@@ -19,6 +19,8 @@ function WeatherApp() {
   const [listScrollY, setListScrollY] = useState(0)
   // スクロール位置復元するかどうか
   const [restoreScroll, setRestoreScroll] = useState(false)
+  // 日付選択 -> Wether Cardのローディング画面用
+  const [isLoading, setIsLoading] = useState(false)
   // WeatherCard
   const [weather, setWeather] = useState(null)
   // SPA <-> 別タブ切り替え
@@ -134,12 +136,15 @@ function WeatherApp() {
 
   // 日付を選択したらWeatherCardAPIを呼ぶ
   function loadWeather(date) {
-    // 日付選択時のスクロール位置保存
-    setListScrollY(window.scrollY)
-
     if (!selectedLocation) {
       return
     }
+
+    // 日付選択時のスクロール位置保存
+    setListScrollY(window.scrollY)
+
+    // ローディングフラグ
+    setIsLoading(true)
 
     fetch(`/api/weather/${selectedLocation.station_type}/${selectedLocation.block_no}/${date}`)
     .then(response => {
@@ -155,6 +160,9 @@ function WeatherApp() {
     .catch(error => {
       console.error(error)
     })
+    .finally(() => {
+      setIsLoading(false)
+    })
   }
 
   // 日付選択に戻るを押下したときの処理
@@ -165,15 +173,19 @@ function WeatherApp() {
 
   return (
     <div className="weather-selector">
-      <div className="new-tab-toggle">
-        <label>
+      <div className="selector-options">
+        <label className="new-tab-toggle">
+          <span className="toggle-label">
+            別タブ表示
+          </span>
           <input
             type="checkbox" checked={openNewTab}
             onChange={event => setOpenNewTab(event.target.checked)}
           />
-          別タブ表示
+          <span className="toggle-switch"></span>
         </label>
       </div>
+
       <div className="select-group">
         <label htmlFor="prefecture-select">
           都府県
@@ -213,7 +225,7 @@ function WeatherApp() {
         </select>
       </div>
 
-      {!weather && (
+      {!weather && !isLoading && (
         <>
           {selectedLocation && (
             <div className="selected-location">
@@ -238,7 +250,14 @@ function WeatherApp() {
         </>
       )}
 
-      {weather && (
+      {isLoading && (
+        <div className="weather-loading">
+          <div className="spinner"></div>
+          <div>気象データを読み込んでいます...</div>
+        </div>
+      )}
+
+      {weather && !isLoading && (
         <WeatherView
          weather={weather}
          onBack={handleBack} />
