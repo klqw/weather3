@@ -1,7 +1,7 @@
 import { useState } from "react"
 import ExtremeDetails from "./extreme-details"
 
-function WeatherView({weather, onBack}) {
+function WeatherView({weather, dates, onBack, onSelectDate}) {
   const [activeTab, setActiveTab] = useState("day")
 
   // activeにするデータ値を取得する
@@ -14,6 +14,25 @@ function WeatherView({weather, onBack}) {
   }
 
   const date = weather.location.observed_date.replaceAll("-", "")
+  const observedDate = weather.location.observed_date
+  const [year, month, day] = observedDate.split("-").map(Number)
+
+  // 日付切り替え時の候補日を先に取得
+  const beforeYear = getMoveDate(observedDate, "year", "prev")
+  const afterYear = getMoveDate(observedDate, "year", "next")
+  const beforeMonth = getMoveDate(observedDate, "month", "prev")
+  const afterMonth = getMoveDate(observedDate, "month", "next")
+  const beforeDay = getMoveDate(observedDate, "day", "prev")
+  const afterDay = getMoveDate(observedDate, "day", "next")
+
+  // 候補日が対象地点の観測日に含まれるかをチェック
+  const availableDates = new Set(dates.map(date => date.replaceAll("-", "")))
+  const hasBeforeYear = availableDates.has(beforeYear)
+  const hasAfterYear = availableDates.has(afterYear)
+  const hasBeforeMonth = availableDates.has(beforeMonth)
+  const hasAfterMonth = availableDates.has(afterMonth)
+  const hasBeforeDay = availableDates.has(beforeDay)
+  const hasAfterDay = availableDates.has(afterDay)
 
   return (
     <div className="weather-view">
@@ -28,6 +47,41 @@ function WeatherView({weather, onBack}) {
       </header>
 
       <button type="button" className="weather-back" onClick={onBack}>←日付選択に戻る</button>
+
+      <div className="date-navigator">
+        <div className="date-nav-row">
+          <span className="date-nav-label">年</span>
+          <button type="button" disabled={!hasBeforeYear} onClick={() => onSelectDate(getMoveDate(observedDate, "year", "prev"))} aria-label="前年">
+            ◀
+          </button>
+          <span className="date-nav-value">{year}年</span>
+          <button type="button" disabled={!hasAfterYear} onClick={() => onSelectDate(getMoveDate(observedDate, "year", "next"))} aria-label="翌年">
+            ▶
+          </button>
+        </div>
+
+        <div className="date-nav-row">
+          <span className="date-nav-label">月</span>
+          <button type="button" disabled={!hasBeforeMonth} onClick={() => onSelectDate(getMoveDate(observedDate, "month", "prev"))} aria-label="前月">
+            ◀
+          </button>
+          <span className="date-nav-value">{month}月</span>
+          <button type="button" disabled={!hasAfterMonth} onClick={() => onSelectDate(getMoveDate(observedDate, "month", "next"))} aria-label="翌月">
+            ▶
+          </button>
+        </div>
+
+        <div className="date-nav-row">
+          <span className="date-nav-label">日</span>
+          <button type="button" disabled={!hasBeforeDay} onClick={() => onSelectDate(getMoveDate(observedDate, "day", "prev"))} aria-label="前日">
+            ◀
+          </button>
+          <span className="date-nav-value">{day}日</span>
+          <button type="button" disabled={!hasAfterDay} onClick={() => onSelectDate(getMoveDate(observedDate, "day", "next"))} aria-label="翌日">
+            ▶
+          </button>
+        </div>
+      </div>
 
       <div className="weather-tabs">
         <button
@@ -200,6 +254,73 @@ function WeatherView({weather, onBack}) {
   )
 }
 
+/**
+ * 日付移動のための日付取得
+  * dateString: YYYY-MM-dd
+  * unit: year / month / day
+  * direction: prev / next
+*/
+function getMoveDate(dateString, unit, direction) {
+  const [year, month, day] = dateString.split("-").map(Number)
+  const move = direction === "prev" ? -1 : 1
+  let targetYear = year
+  let targetMonth = month
+  let targetDay = day
+
+  // year: ±1, month: そのまま, day: 対象日と末日のより小さな値
+  if (unit === "year") {
+    targetYear += move
+    const lastDay = getLastDayOfMonth(targetYear, targetMonth)
+    targetDay = Math.min(day, lastDay)
+  }
+
+  // year: 1月 & prev = -1, month: ±1 / 1月 & prev = 12, 12月 & next = 1, day: 対象日と末日のより小さな値
+  if (unit === "month") {
+    targetMonth += move
+
+    // 1月 & prev
+    if (targetMonth === 0) {
+      targetYear -= 1
+      targetMonth = 12
+    }
+
+    // 12月 & next
+    if (targetMonth === 13) {
+      targetYear += 1
+      targetMonth = 1
+    }
+
+    // 対象日と対象月の末日のより小さな値を設定
+    const lastDay = getLastDayOfMonth(targetYear, targetMonth)
+    targetDay = Math.min(day, lastDay)
+  }
+
+  // day±1の値から日付を取得して対象年月日に設定
+  if (unit === "day") {
+    const date = new Date(year, month - 1, day + move)
+
+    targetYear = date.getFullYear()
+    targetMonth = date.getMonth() + 1
+    targetDay = date.getDate()
+  }
+
+  return formatApiDate(targetYear, targetMonth, targetDay)
+
+}
+
+// 対象の年月の末日を取得
+function getLastDayOfMonth(year, month) {
+  return new Date(year, month, 0).getDate()
+}
+
+// APIに渡すdateのフォーマット
+function formatApiDate(year, month, day) {
+  return (
+    String(year) + String(month).padStart(2, "0") + String(day).padStart(2, "0")
+  )
+}
+
+// Viewに渡すdateのフォーマット
 function formatDate(dateString) {
   const [year, month, day] = dateString.split("-")
   return `${Number(year)}年${Number(month)}月${Number(day)}日`

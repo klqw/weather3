@@ -134,14 +134,18 @@ function WeatherApp() {
     setOpenMonths({})
   }
 
-  // 日付を選択したらWeatherCardAPIを呼ぶ
+  // 地点日付選択 -> WeatherCardAPI
+  function selectDateFromList(date) {
+    // 日付選択時のスクロール位置保存
+    setListScrollY(window.scrollY)
+    loadWeather(date)
+  }
+
+  // WeatherCard日付選択 -> WeatherCardAPI
   function loadWeather(date) {
     if (!selectedLocation) {
       return
     }
-
-    // 日付選択時のスクロール位置保存
-    setListScrollY(window.scrollY)
 
     // ローディングフラグ
     setIsLoading(true)
@@ -239,7 +243,7 @@ function WeatherApp() {
              dates={dates}
              stationType={selectedLocation.station_type}
              blockNo={selectedLocation.block_no}
-             onSelectDate={loadWeather}
+             onSelectDate={selectDateFromList}
              openNewTab={openNewTab}
              openYears={openYears}
              setOpenYears={setOpenYears}
@@ -260,7 +264,10 @@ function WeatherApp() {
       {weather && !isLoading && (
         <WeatherView
          weather={weather}
-         onBack={handleBack} />
+         dates={dates}
+         onBack={handleBack}
+         onSelectDate={loadWeather}
+        />
       )}
     </div>
   )

@@ -533,7 +533,7 @@ hr {
 }
 
 /* --------------------
-   SPAのタブ
+   ナビゲーションボタン
 -------------------- */
 .weather-back {
   padding: 7px 12px;
@@ -547,6 +547,63 @@ hr {
   cursor: pointer;
 }
 
+.date-navigator {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 16px 0 20px;
+}
+
+.date-nav-row {
+  display: grid;
+  grid-template-columns: 24px 40px 100px 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.date-nav-label {
+  color: #77715c;
+  font-size: 0.85em;
+  font-weight: bold;
+}
+
+.date-nav-value {
+  text-align: center;
+  color: #4a4635;
+  font-size: 1.1em;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
+
+.date-nav-row button {
+  width: 40px;
+  height: 34px;
+  padding: 0;
+  color: #4a4635;
+  background-color: white;
+  border: 1px solid #e8dfad;
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.date-nav-row button:hover:not(:disabled) {
+  background-color: #17e975;
+}
+
+.date-nav-row button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.date-nav-row button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+/* --------------------
+   Cardのタブ
+-------------------- */
 .weather-back:hover {
   background-color: #17e975;
 }
