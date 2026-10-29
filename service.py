@@ -357,7 +357,7 @@ def calc_score(base_value, max_value, min_value):
       result[column] = 0
 
     elif max_value[column] == min_value[column]:
-      result[column] = 0
+      result[column] = 50
 
     else:
       result[column] = (base_value[column] - min_value[column]) / (max_value[column] - min_value[column]) * 99 + 1
@@ -840,24 +840,37 @@ def get_observation_records(config, candidates, column):
       value
     ) AS (
       VALUES {placeholders}
+    ),
+    ranked AS (
+      SELECT
+        w.location_id,
+        w.observed_date,
+        w.{column} AS value,
+        l.name,
+        l.prefecture_name,
+        COUNT(*) OVER () AS total_count,
+        ROW_NUMBER() OVER (
+          ORDER BY w.location_id, w.observed_date
+        ) AS row_num
+      FROM weather_observations AS w
+      INNER JOIN candidates AS c
+        ON w.location_id = c.location_id
+        AND EXTRACT(MONTH FROM w.observed_date) = c.month
+        AND EXTRACT(DAY FROM w.observed_date) = c.day
+        AND w.{column} = c.value
+      INNER JOIN locations AS l
+        ON w.location_id = l.location_id
     )
     SELECT
-      w.location_id,
-      w.observed_date,
-      w.{column} AS value,
-      l.name,
-      l.prefecture_name
-    FROM weather_observations AS w
-    INNER JOIN candidates AS c
-      ON w.location_id = c.location_id
-      AND EXTRACT(MONTH FROM w.observed_date) = c.month
-      AND EXTRACT(DAY FROM w.observed_date) = c.day
-      AND w.{column} = c.value
-    INNER JOIN locations AS l
-      ON w.location_id = l.location_id
-    ORDER BY
-      w.location_id,
-      w.observed_date;
+      location_id,
+      observed_date,
+      value,
+      name,
+      prefecture_name,
+      total_count
+    FROM ranked
+    WHERE row_num <= 20
+    ORDER BY row_num;
   """
 
   with get_connection(config) as conn:

@@ -74,7 +74,7 @@
     "unit": "m/s",
     "low_label": "Calm",
     "high_label": "Windy",
-    "extremes": ["max"],
+    "extremes": ["max", "min"],
     "colors": [
       "#8fd3a8",
       "#5fbd82",

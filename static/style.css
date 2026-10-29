@@ -11,9 +11,6 @@ body {
 }
 
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
   background: #fffbea;
   padding: 12px 20px;
 }
@@ -264,6 +261,18 @@ body {
   }
 }
 
+.weather-view-wrapper {
+  position: relative;
+}
+
+.card-loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+}
+
 /* --------------------
    Card部分
 -------------------- */
@@ -466,7 +475,7 @@ hr {
 }
 
 .extreme-popup {
-  width: min(90%, 420px);
+  width: min(90%, 500px);
   max-height: 80vh;
   overflow-y: auto;
   padding: 20px;
@@ -536,6 +545,7 @@ hr {
    ナビゲーションボタン
 -------------------- */
 .weather-back {
+  margin-left: 20px;
   padding: 7px 12px;
   color: #4a4635;
   background-color: #fffbea;
@@ -547,9 +557,23 @@ hr {
   cursor: pointer;
 }
 
+.weather-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 10px 0;
+  background-color: #fffbea;
+}
+
+.header h1.card-header {
+  font-size: 1.4em;
+}
+
 .date-navigator {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 6px;
   margin: 16px 0 20px;
 }
@@ -646,7 +670,7 @@ hr {
 }
 
 /* --------------------
-   SP用
+   SP用 (全般)
 -------------------- */
 @media (max-width: 600px) {
   body {
@@ -655,6 +679,10 @@ hr {
 
   .header {
     padding: 10px 12px;
+  }
+
+  .header h1.card-header {
+    font-size: 1.2em;
   }
 
   .weather-selector {
@@ -669,5 +697,56 @@ hr {
   .date-days a, .date-days button {
     min-width: 44px;
     padding: 7px 8px;
+  }
+}
+
+/* --------------------
+   SP用 (狭い)
+-------------------- */
+@media (max-width: 500px) {
+  .header {
+    position: static;
+  }
+
+  .weather-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 6px 0 8px;
+  }
+
+  .weather-back {
+    margin-left: 10px;
+    margin-bottom: 6px;
+    padding: 5px 8px;
+    font-size: 0.85em;
+  }
+
+  .date-navigator {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin: 0;
+  }
+
+  .date-nav-row {
+    display: grid;
+    grid-template-columns: 26px 1fr 26px;
+    gap: 2px;
+  }
+
+  .date-nav-label {
+    display: none;
+  }
+
+  .date-nav-row button {
+    width: 26px;
+    height: 30px;
+    font-size: 0.75em;
+  }
+
+  .date-nav-value {
+    font-size: 0.9em;
+    white-space: nowrap;
   }
 }

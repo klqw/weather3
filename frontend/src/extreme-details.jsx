@@ -47,6 +47,11 @@ function ExtremeDetails({locationId, date, metric, comparison, label, extreme, l
 
             {records.length > 0 ? (
               <>
+                {records[0].total_count > records.length && (
+                  <p className="extreme-note">
+                    ※ 同率記録 {records[0].total_count}件 のうち {records.length}件 まで表示しています。
+                  </p>
+                )}
                 <div
                  className="extreme-value"
                  style={{ borderLeftColor: labelColor }}

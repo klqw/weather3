@@ -15,6 +15,8 @@ function WeatherApp() {
   // 日付展開状態
   const [openYears, setOpenYears] = useState({})
   const [openMonths, setOpenMonths] = useState({})
+  // Weather Card初回表示用フラグ
+  const [resetCardScroll, setResetCardScroll] = useState(false)
   // 日付選択時のスクロール位置
   const [listScrollY, setListScrollY] = useState(0)
   // スクロール位置復元するかどうか
@@ -86,23 +88,24 @@ function WeatherApp() {
 
   // 日付選択 <-> Weather Cardのスクロール位置調整
   useLayoutEffect(() => {
-    // Weather Cardを表示したとき
-    if (weather) {
+    // 日付選択画面 -> Weather Card
+    if (weather && resetCardScroll) {
       window.scrollTo({
-        top: 250,
+        top: 0,
         behavior: "auto"
       })
+      setResetCardScroll(false)
       return
     }
-    // 日付選択に戻るとき
-    if (restoreScroll) {
+    // Weather Card -> 日付選択画面
+    if (!weather && restoreScroll) {
       window.scrollTo({
         top: listScrollY,
         behavior: "auto"
       })
       setRestoreScroll(false)
     }
-  }, [weather, restoreScroll, listScrollY])
+  }, [weather, resetCardScroll ,restoreScroll, listScrollY])
 
   function handlePrefectureChange(event) {
     setSelectedPrecNo(event.target.value)
@@ -138,6 +141,7 @@ function WeatherApp() {
   function selectDateFromList(date) {
     // 日付選択時のスクロール位置保存
     setListScrollY(window.scrollY)
+    setResetCardScroll(true)
     loadWeather(date)
   }
 
@@ -254,20 +258,28 @@ function WeatherApp() {
         </>
       )}
 
-      {isLoading && (
+      {isLoading && !weather && (
         <div className="weather-loading">
           <div className="spinner"></div>
           <div>気象データを読み込んでいます...</div>
         </div>
       )}
 
-      {weather && !isLoading && (
-        <WeatherView
-         weather={weather}
-         dates={dates}
-         onBack={handleBack}
-         onSelectDate={loadWeather}
-        />
+      {weather && (
+        <div className="weather-view-wrapper">
+          {isLoading && (
+            <div className="card-loading">
+              <div className="spinner"></div>
+            </div>
+          )}
+
+          <WeatherView
+            weather={weather}
+            dates={dates}
+            onBack={handleBack}
+            onSelectDate={loadWeather}
+          />
+        </div>
       )}
     </div>
   )

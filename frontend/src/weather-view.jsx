@@ -36,52 +36,56 @@ function WeatherView({weather, dates, onBack, onSelectDate}) {
 
   return (
     <div className="weather-view">
-      <header className="header">
-        <h1>
-          {formatDate(weather.location.observed_date)}
-          {" "}
-          {weather.location.name}
-          {" - "}
-          {weather.location.prefecture_name}
-        </h1>
-      </header>
+      <div className="weather-toolbar">
+        <header className="header">
+          <h1 className="card-header">
+            {formatDate(weather.location.observed_date)}
+            {" "}
+            {weather.location.name}
+            {" - "}
+            {weather.location.prefecture_name}
+          </h1>
+        </header>
 
-      <button type="button" className="weather-back" onClick={onBack}>←日付選択に戻る</button>
+        <button type="button" className="weather-back" onClick={onBack}>←日付選択に戻る</button>
 
-      <div className="date-navigator">
-        <div className="date-nav-row">
-          <span className="date-nav-label">年</span>
-          <button type="button" disabled={!hasBeforeYear} onClick={() => onSelectDate(getMoveDate(observedDate, "year", "prev"))} aria-label="前年">
-            ◀
-          </button>
-          <span className="date-nav-value">{year}年</span>
-          <button type="button" disabled={!hasAfterYear} onClick={() => onSelectDate(getMoveDate(observedDate, "year", "next"))} aria-label="翌年">
-            ▶
-          </button>
-        </div>
+        <div className="date-navigator">
+          <div className="date-nav-row">
+            <span className="date-nav-label">年</span>
+            <button type="button" disabled={!hasBeforeYear} onClick={() => onSelectDate(getMoveDate(observedDate, "year", "prev"))} aria-label="前年">
+              ◀
+            </button>
+            <span className="date-nav-value">{year}年</span>
+            <button type="button" disabled={!hasAfterYear} onClick={() => onSelectDate(getMoveDate(observedDate, "year", "next"))} aria-label="翌年">
+              ▶
+            </button>
+          </div>
 
-        <div className="date-nav-row">
-          <span className="date-nav-label">月</span>
-          <button type="button" disabled={!hasBeforeMonth} onClick={() => onSelectDate(getMoveDate(observedDate, "month", "prev"))} aria-label="前月">
-            ◀
-          </button>
-          <span className="date-nav-value">{month}月</span>
-          <button type="button" disabled={!hasAfterMonth} onClick={() => onSelectDate(getMoveDate(observedDate, "month", "next"))} aria-label="翌月">
-            ▶
-          </button>
-        </div>
+          <div className="date-nav-row">
+            <span className="date-nav-label">月</span>
+            <button type="button" disabled={!hasBeforeMonth} onClick={() => onSelectDate(getMoveDate(observedDate, "month", "prev"))} aria-label="前月">
+              ◀
+            </button>
+            <span className="date-nav-value">{month}月</span>
+            <button type="button" disabled={!hasAfterMonth} onClick={() => onSelectDate(getMoveDate(observedDate, "month", "next"))} aria-label="翌月">
+              ▶
+            </button>
+          </div>
 
-        <div className="date-nav-row">
-          <span className="date-nav-label">日</span>
-          <button type="button" disabled={!hasBeforeDay} onClick={() => onSelectDate(getMoveDate(observedDate, "day", "prev"))} aria-label="前日">
-            ◀
-          </button>
-          <span className="date-nav-value">{day}日</span>
-          <button type="button" disabled={!hasAfterDay} onClick={() => onSelectDate(getMoveDate(observedDate, "day", "next"))} aria-label="翌日">
-            ▶
-          </button>
+          <div className="date-nav-row">
+            <span className="date-nav-label">日</span>
+            <button type="button" disabled={!hasBeforeDay} onClick={() => onSelectDate(getMoveDate(observedDate, "day", "prev"))} aria-label="前日">
+              ◀
+            </button>
+            <span className="date-nav-value">{day}日</span>
+            <button type="button" disabled={!hasAfterDay} onClick={() => onSelectDate(getMoveDate(observedDate, "day", "next"))} aria-label="翌日">
+              ▶
+            </button>
+          </div>
         </div>
       </div>
+
+
 
       <div className="weather-tabs">
         <button
