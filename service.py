@@ -1,7 +1,7 @@
 import psycopg
 import pandas as pd
 import numpy as np
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from db import get_connection
 from psycopg.rows import dict_row
@@ -11,7 +11,7 @@ from psycopg.rows import dict_row
 # --------------------
 def get_navigation_dates(date_str, available_dates):
   # 現在の日付をdate型に変換
-  current_date = date.fromisoformat(date_str)
+  current_date = datetime.strptime(date_str, "%Y%m%d").date()
 
   # 前年・翌年・前月・翌月・前日・翌日の日付を計算
   candidates = {
