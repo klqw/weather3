@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ status_code }} {{ error_title }} | Weather3</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/error.css') }}">
+</head>
+<body>
+  <main class="error-page error-{{ status_code }}{% if error_variant %} error-{{ error_variant }}{% endif %}">
+    <div class="error-message">
+      <h1>{{ status_code }}</h1>
+      <h2>{{ error_title }}</h2>
+      <p>{{ error_message }}</p>
+      <a href="/">気象データ検索に戻る</a>
+    </div>
+  </main>
+</body>
+</html>

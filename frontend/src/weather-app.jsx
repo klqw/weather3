@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useState } from "react"
 import { createRoot } from "react-dom/client"
 import LocationDates from "./location-dates"
 import WeatherView from "./weather-view"
+import { throwApiError, redirectToErrorPage } from "./api-error"
 
 function WeatherApp() {
   // 都府県
@@ -31,10 +32,18 @@ function WeatherApp() {
   // ページを読み込んだら都府県APIを呼ぶ
   useEffect(() => {
     fetch("/api/prefectures")
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throwApiError(response)
+      }
+
+      return response.json()
+    })
     .then(data => {
+      // 正常時の処理
       setPrefectures(data)
     })
+    .catch(redirectToErrorPage)
   }, [])
 
   // 都府県を選択したら地点APIを呼ぶ
@@ -45,10 +54,18 @@ function WeatherApp() {
     }
 
     fetch(`/api/locations/${selectedPrecNo}`)
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throwApiError(response)
+      }
+
+      return response.json()
+    })
     .then(data => {
+      // 正常時の処理
       setLocations(data)
     })
+    .catch(redirectToErrorPage)
   }, [selectedPrecNo])
 
   // 地点を選択したら日付APIを呼ぶ
@@ -59,10 +76,18 @@ function WeatherApp() {
     }
 
     fetch(`/api/location/${selectedLocation.station_type}/${selectedLocation.block_no}/dates`)
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throwApiError(response)
+      }
+
+      return response.json()
+    })
     .then(data => {
+      // 正常時の処理
       setDates(data)
     })
+    .catch(redirectToErrorPage)
   }, [selectedLocation])
 
   // 画面を狭くしたときに別タブモードを強制的に解除する
@@ -157,17 +182,16 @@ function WeatherApp() {
     fetch(`/api/weather/${selectedLocation.station_type}/${selectedLocation.block_no}/${date}`)
     .then(response => {
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
+        throwApiError(response)
       }
 
       return response.json()
     })
     .then(data => {
+      // 正常処理
       setWeather(data)
     })
-    .catch(error => {
-      console.error(error)
-    })
+    .catch(redirectToErrorPage)
     .finally(() => {
       setIsLoading(false)
     })

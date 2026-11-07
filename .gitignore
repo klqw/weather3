@@ -229,3 +229,6 @@ frontend/.vite/
 
 # Logs
 log/
+
+# Images
+static/images/

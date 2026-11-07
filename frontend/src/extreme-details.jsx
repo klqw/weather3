@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { createRoot } from "react-dom/client"
+import { throwApiError, redirectToErrorPage } from "./api-error"
 
 function ExtremeDetails({locationId, date, metric, comparison, label, extreme, labelColor, unit, enabled}) {
   const [records, setRecords] = useState([])
@@ -13,18 +14,17 @@ function ExtremeDetails({locationId, date, metric, comparison, label, extreme, l
     fetch(`/api/extremes/${metric}/${comparison}/${extreme}/${locationId}/${date}`)
     .then(response => {
       if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
+        throwApiError(response)
       }
 
       return response.json()
     })
     .then(data => {
+      // 正常処理
       setRecords(data)
       setOpen(true)
     })
-    .catch(error => {
-      console.error(error)
-    })
+    .catch(redirectToErrorPage)
   }
 
   return (

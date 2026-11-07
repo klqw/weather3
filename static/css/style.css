@@ -600,7 +600,11 @@ hr {
   letter-spacing: 0.05em;
 }
 
-.date-nav-row button {
+.date-nav-row button, .date-nav-row a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   width: 40px;
   height: 34px;
   padding: 0;
@@ -609,6 +613,7 @@ hr {
   border: 1px solid #e8dfad;
   border-radius: 6px;
   font: inherit;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -739,7 +744,7 @@ hr {
     display: none;
   }
 
-  .date-nav-row button {
+  .date-nav-row button, .date-nav-row a {
     width: 26px;
     height: 30px;
     font-size: 0.75em;

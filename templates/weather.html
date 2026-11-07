@@ -7,15 +7,64 @@
     {{ weather.location.observed_date.year}}年{{ weather.location.observed_date.month}}月{{ weather.location.observed_date.day}}日
     {{ weather.location.name }} - {{ weather.location.prefecture_name }}
   </title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-  <header class="header">
-    <h1>
-      {{ weather.location.observed_date.year }}年{{ weather.location.observed_date.month }}月{{ weather.location.observed_date.day }}日
-      {{ weather.location.name }} - {{ weather.location.prefecture_name }}
-    </h1>
-  </header>
+  <div class="weather-toolbar">
+    <header class="header">
+      <h1 class="card-header">
+        {{ weather.location.observed_date.year }}年{{ weather.location.observed_date.month }}月{{ weather.location.observed_date.day }}日
+        {{ weather.location.name }} - {{ weather.location.prefecture_name }}
+      </h1>
+    </header>
+
+    <div class="date-navigator">
+      <div class="date-nav-row">
+        <span class="date-nav-label">年</span>
+        {% if navigation.prev_year %}
+          <a href="/weather/{{ station_type }}/{{ block_no }}/{{ navigation.prev_year }}">◀</a>
+        {% else %}
+          <button type="button" disabled>◀</button>
+        {% endif %}
+        <span class="date-nav-value">{{ weather.location.observed_date.year }}年</span>
+        {% if navigation.next_year %}
+          <a href="/weather/{{ station_type }}/{{ block_no }}/{{ navigation.next_year }}">▶</a>
+        {% else %}
+          <button type="button" disabled>▶</button>
+        {% endif %}
+      </div>
+
+      <div class="date-nav-row">
+        <span class="date-nav-label">月</span>
+        {% if navigation.prev_month %}
+          <a href="/weather/{{ station_type }}/{{ block_no }}/{{ navigation.prev_month }}">◀</a>
+        {% else %}
+          <button type="button" disabled>◀</button>
+        {% endif %}
+        <span class="date-nav-value">{{ weather.location.observed_date.month }}月</span>
+        {% if navigation.next_month %}
+          <a href="/weather/{{ station_type }}/{{ block_no }}/{{ navigation.next_month }}">▶</a>
+        {% else %}
+          <button type="button" disabled>▶</button>
+        {% endif %}
+      </div>
+
+      <div class="date-nav-row">
+        <span class="date-nav-label">日</span>
+        {% if navigation.prev_day %}
+          <a href="/weather/{{ station_type }}/{{ block_no }}/{{ navigation.prev_day }}">◀</a>
+        {% else %}
+          <button type="button" disabled>◀</button>
+        {% endif %}
+        <span class="date-nav-value">{{ weather.location.observed_date.day }}日</span>
+        {% if navigation.next_day %}
+          <a href="/weather/{{ station_type }}/{{ block_no }}/{{ navigation.next_day }}">▶</a>
+        {% else %}
+          <button type="button" disabled>▶</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 
   <div class="weather-tabs">
     <button type="button" class="active" data-tab="day">

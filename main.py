@@ -1,13 +1,35 @@
+import re
 import configparser
 from datetime import datetime
+from fastapi import HTTPException
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from pathlib import Path
 import weather as w
+import service
 
 BASE_DIR = Path(__file__).resolve().parent
 CONFIG_FILE = BASE_DIR / "config" / "config.ini"
+ERROR_PAGES = {
+  403: {
+    "title": "FORBIDDEN",
+    "message": "このページにはアクセスできません。"
+  },
+  404: {
+    "title": "NOT FOUND",
+    "message": "お探しのページが見つかりませんでした。"
+  },
+  500: {
+    "title": "INTERNAL SERVER ERROR",
+    "message": "システム内でエラーが発生しました。"
+  },
+  503: {
+    "title": "SERVICE UNAVAILABLE",
+    "message": "ただいまサービスをご利用いただけません。"
+  }
+}
 
 # --------------------
 # 設定ファイル
@@ -80,6 +102,18 @@ def weather(
   block_no: str,
   date: str
 ):
+  # URLの簡易チェック
+  if len(station_type) != 1 or len(block_no) > 10:
+    raise HTTPException(status_code=404)
+  
+  if not re.fullmatch(r"\d{8}", date):
+    raise HTTPException(status_code=404)
+
+  try:
+    datetime.strptime(date, "%Y%m%d")
+  except ValueError:
+    raise HTTPException(status_code=404)
+  
   config = load_config()
   weather_data = w.get_weather_card(
     station_type,
@@ -88,11 +122,35 @@ def weather(
     config
   )
 
+  # 観測データを取得できなかった場合
+  if weather_data is None:
+    raise HTTPException(
+      status_code=404,
+      detail="weather_not_found"
+    )
+
+  observations = w.get_location_dates(
+    station_type,
+    block_no,
+    config
+  )
+
+  available_dates = {
+    row["observed_date"] for row in observations
+  }
+  navigation = service.get_navigation_dates(
+    date,
+    available_dates
+  )
+
   return templates.TemplateResponse(
     request=request,
     name="weather.html",
     context={
-      "weather": weather_data
+      "weather": weather_data,
+      "station_type": station_type,
+      "block_no": block_no,
+      "navigation": navigation
     }
   )
 
@@ -143,3 +201,68 @@ def get_extremes(
     location_id,
     observed_date
   )
+
+# エラーページ
+def render_error_page(request, status_code, variant=None):
+  error = ERROR_PAGES[status_code]
+
+  error_title = error["title"]
+  error_message = error["message"]
+
+  if variant == "no-data":
+    error_title = "NO DATA"
+    error_message = "観測データは見つかりませんでした。"
+
+  return templates.TemplateResponse(
+    request=request,
+    name="error.html",
+    context={
+      "status_code": status_code,
+      "error_title": error_title,
+      "error_message": error_message,
+      "error_variant": variant
+    },
+    status_code=status_code
+  )
+
+# 別タブ
+# 403 / 404 / 503
+@app.exception_handler(403)
+@app.exception_handler(404)
+@app.exception_handler(503)
+async def not_found_handler(request: Request, exc):
+  status_code = exc.status_code
+
+  if request.url.path.startswith("/api/"):
+    return JSONResponse(
+      status_code=status_code,
+      content={"detail": str(exc.detail)},
+      headers=getattr(exc, "headers", None)
+    )
+
+  error_variant = (
+    "no-data"
+    if status_code == 404
+    and exc.detail == "weather_not_found"
+    else None
+  )
+
+  return render_error_page(request, status_code, variant=error_variant)
+
+# 500
+@app.exception_handler(500)
+async def internal_error_handler(request: Request, exc):
+  if request.url.path.startswith("/api/"):
+    return JSONResponse(
+      status_code=500,
+      content={"detail": "Internal Server Error"}
+    )
+
+  return render_error_page(request, 500)
+
+# SPA
+@app.get("/error/{status_code}")
+def error_page(request: Request, status_code: int):
+  if status_code not in ERROR_PAGES:
+    raise HTTPException(status_code=404)
+  return render_error_page(request, status_code)

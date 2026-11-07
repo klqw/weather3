@@ -171,6 +171,11 @@ def get_weather_card(station_type, block_no, date_str, config):
     with conn.cursor(row_factory=dict_row) as cur:
       cur.execute(sql, (station_type, block_no, observed_date))
       weather_row = cur.fetchone()
+
+      # 観測データが存在しない場合
+      if weather_row is None:
+        return None
+      
       target_data = pd.DataFrame([weather_row])
       target_data["observed_date"] = pd.to_datetime(target_data["observed_date"])
       target_data["month"] = target_data["observed_date"].dt.month

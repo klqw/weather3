@@ -1,8 +1,36 @@
 import psycopg
 import pandas as pd
 import numpy as np
+from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 from db import get_connection
 from psycopg.rows import dict_row
+
+# --------------------
+# ナビゲーションボタン遷移先計算
+# --------------------
+def get_navigation_dates(date_str, available_dates):
+  # 現在の日付をdate型に変換
+  current_date = date.fromisoformat(date_str)
+
+  # 前年・翌年・前月・翌月・前日・翌日の日付を計算
+  candidates = {
+    "prev_year": current_date - relativedelta(years=1),
+    "next_year": current_date + relativedelta(years=1),
+    "prev_month": current_date - relativedelta(months=1),
+    "next_month": current_date + relativedelta(months=1),
+    "prev_day": current_date - timedelta(days=1),
+    "next_day": current_date + timedelta(days=1)
+  }
+
+  # available_datesに含まれる日付だけを有効化
+  navigation = {
+    key: value.strftime("%Y%m%d") if value in available_dates else None
+    for key, value in candidates.items()
+  }
+
+  return navigation
+
 
 # --------------------
 # データ計算
